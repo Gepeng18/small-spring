@@ -37,8 +37,8 @@ public class GenericConversionService implements ConversionService, ConverterReg
 
     @Override
     public void addConverter(Converter<?, ?> converter) {
-        GenericConverter.ConvertiblePair typeInfo = getRequiredTypeInfo(converter);
-        ConverterAdapter converterAdapter = new ConverterAdapter(typeInfo, converter);
+        GenericConverter.ConvertiblePair convertiblePair = getRequiredTypeInfo(converter);
+        ConverterAdapter converterAdapter = new ConverterAdapter(convertiblePair, converter);
         for (GenericConverter.ConvertiblePair convertibleType : converterAdapter.getConvertibleTypes()) {
             converters.put(convertibleType, converterAdapter);
         }
@@ -46,8 +46,8 @@ public class GenericConversionService implements ConversionService, ConverterReg
 
     @Override
     public void addConverterFactory(ConverterFactory<?, ?> converterFactory) {
-        GenericConverter.ConvertiblePair typeInfo = getRequiredTypeInfo(converterFactory);
-        ConverterFactoryAdapter converterFactoryAdapter = new ConverterFactoryAdapter(typeInfo, converterFactory);
+        GenericConverter.ConvertiblePair convertiblePair = getRequiredTypeInfo(converterFactory);
+        ConverterFactoryAdapter converterFactoryAdapter = new ConverterFactoryAdapter(convertiblePair, converterFactory);
         for (GenericConverter.ConvertiblePair convertibleType : converterFactoryAdapter.getConvertibleTypes()) {
             converters.put(convertibleType, converterFactoryAdapter);
         }
@@ -60,6 +60,11 @@ public class GenericConversionService implements ConversionService, ConverterReg
         }
     }
 
+    /**
+     * 猜测是解析接口的泛型
+     * 第一个参数是sourceType
+     * 第二个参数是targetType
+     */
     private GenericConverter.ConvertiblePair getRequiredTypeInfo(Object object) {
         Type[] types = object.getClass().getGenericInterfaces();
         ParameterizedType parameterized = (ParameterizedType) types[0];
@@ -69,6 +74,12 @@ public class GenericConversionService implements ConversionService, ConverterReg
         return new GenericConverter.ConvertiblePair(sourceType, targetType);
     }
 
+    /**
+     * 判断sourceType的父类和targetType的父类的n的平方种组合是否有对应的convert
+     * @param sourceType
+     * @param targetType
+     * @return
+     */
     protected GenericConverter getConverter(Class<?> sourceType, Class<?> targetType) {
         List<Class<?>> sourceCandidates = getClassHierarchy(sourceType);
         List<Class<?>> targetCandidates = getClassHierarchy(targetType);
@@ -97,11 +108,11 @@ public class GenericConversionService implements ConversionService, ConverterReg
 
         private final ConvertiblePair typeInfo;
 
-        private final Converter<Object, Object> converter;
+        private final Converter<Object, Object> convertiblePair;
 
-        public ConverterAdapter(ConvertiblePair typeInfo, Converter<?, ?> converter) {
-            this.typeInfo = typeInfo;
-            this.converter = (Converter<Object, Object>) converter;
+        public ConverterAdapter(ConvertiblePair convertiblePair, Converter<?, ?> converter) {
+            this.typeInfo = convertiblePair;
+            this.convertiblePair = (Converter<Object, Object>) converter;
         }
 
         @Override
@@ -111,24 +122,24 @@ public class GenericConversionService implements ConversionService, ConverterReg
 
         @Override
         public Object convert(Object source, Class sourceType, Class targetType) {
-            return converter.convert(source);
+            return convertiblePair.convert(source);
         }
     }
 
     private final class ConverterFactoryAdapter implements GenericConverter {
 
-        private final ConvertiblePair typeInfo;
+        private final ConvertiblePair convertiblePair;
 
         private final ConverterFactory<Object, Object> converterFactory;
 
-        public ConverterFactoryAdapter(ConvertiblePair typeInfo, ConverterFactory<?, ?> converterFactory) {
-            this.typeInfo = typeInfo;
+        public ConverterFactoryAdapter(ConvertiblePair convertiblePair, ConverterFactory<?, ?> converterFactory) {
+            this.convertiblePair = convertiblePair;
             this.converterFactory = (ConverterFactory<Object, Object>) converterFactory;
         }
 
         @Override
         public Set<ConvertiblePair> getConvertibleTypes() {
-            return Collections.singleton(typeInfo);
+            return Collections.singleton(convertiblePair);
         }
 
         @Override

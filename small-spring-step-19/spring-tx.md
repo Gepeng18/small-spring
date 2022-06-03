@@ -236,7 +236,7 @@ public void saveDataWithTranslationProxy() throws SQLException {
   - 该接口可以认为是`TransactionAttribute`的包装接口，该接口中就一个获取`TransactionAttribute`的方法。
 
   ```java
-  TransactionAttribute getTransactionAttribute(Method method, @Nullable Class<?> targetClass);
+  TransactionAttribute getTransactionAttribute(Method method,  Class<?> targetClass);
   ```
 
 - AbstractFallbackTransactionAttributeSource
@@ -273,7 +273,7 @@ public void saveDataWithTranslationProxy() throws SQLException {
   - 这是一个比较重要的接口。定义了获取事务状态、事务提交、事务回滚等方法
 
   ```java
-  TransactionStatus getTransaction(@Nullable TransactionDefinition definition)
+  TransactionStatus getTransaction( TransactionDefinition definition)
   
   void commit(TransactionStatus status)
   
@@ -285,7 +285,7 @@ public void saveDataWithTranslationProxy() throws SQLException {
   - 事务管理的抽象实现类。采用同样的套路定义了事务的操作流程，分别是获取事务，事务提交，事务回滚。这三个步骤在不同的数据源上操作又有区别，所以该抽象类同时定义了需要子类去实际执行的抽象方法。
 
   - ```java
-    TransactionStatus getTransaction(@Nullable TransactionDefinition definition)
+    TransactionStatus getTransaction( TransactionDefinition definition)
     ```
 
     获取事务的方法：
@@ -354,7 +354,7 @@ public void saveDataWithTranslationProxy() throws SQLException {
   - 另外定义了一个比较重要的方法
 
     ```java
-    Object invokeWithinTransaction(Method method, @Nullable Class<?> targetClass,
+    Object invokeWithinTransaction(Method method,  Class<?> targetClass,
           final InvocationCallback invocation)
     ```
 

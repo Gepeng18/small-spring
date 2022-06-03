@@ -9,7 +9,7 @@ import cn.bugstack.springframework.core.convert.converter.ConverterRegistry;
 import cn.bugstack.springframework.core.convert.converter.GenericConverter;
 import cn.bugstack.springframework.core.convert.support.DefaultConversionService;
 import cn.bugstack.springframework.core.convert.support.GenericConversionService;
-import com.sun.istack.internal.Nullable;
+
 
 import java.util.Set;
 
@@ -24,10 +24,8 @@ import java.util.Set;
  */
 public class ConversionServiceFactoryBean implements FactoryBean<ConversionService>, InitializingBean {
 
-    @Nullable
     private Set<?> converters;
 
-    @Nullable
     private GenericConversionService conversionService;
 
     @Override

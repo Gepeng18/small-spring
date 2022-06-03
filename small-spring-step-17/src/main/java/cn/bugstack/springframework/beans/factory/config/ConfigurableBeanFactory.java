@@ -3,7 +3,7 @@ package cn.bugstack.springframework.beans.factory.config;
 import cn.bugstack.springframework.beans.factory.HierarchicalBeanFactory;
 import cn.bugstack.springframework.core.convert.ConversionService;
 import cn.bugstack.springframework.util.StringValueResolver;
-import com.sun.istack.internal.Nullable;
+
 
 /**
  * Configuration interface to be implemented by most bean factories. Provides
@@ -50,7 +50,7 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
      * Return the associated ConversionService, if any.
      * @since 3.0
      */
-    @Nullable
+    
     ConversionService getConversionService();
 
 }
