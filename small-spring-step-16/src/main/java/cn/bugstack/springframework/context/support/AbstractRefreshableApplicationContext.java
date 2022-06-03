@@ -11,7 +11,7 @@ import cn.bugstack.springframework.beans.factory.support.DefaultListableBeanFact
  * Typically (but not necessarily), such a context will be driven by
  * a set of config locations to load bean definitions from.
  *
- *
+ * 1、父类中并未存储beanFactory，全程使用getBeanFactory()来获取beanFactory，这里定义beanFactory
  */
 public abstract class AbstractRefreshableApplicationContext extends AbstractApplicationContext {
 

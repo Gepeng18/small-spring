@@ -5,6 +5,9 @@ import cn.hutool.core.lang.Assert;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+/**
+ * 资源加载器，更详细的说，是一个资源加载器策略工厂，根据条件调用不同的策略
+ */
 public class DefaultResourceLoader implements ResourceLoader {
 
     @Override

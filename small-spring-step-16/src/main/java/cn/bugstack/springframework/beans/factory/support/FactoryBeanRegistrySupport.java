@@ -10,8 +10,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * Support base class for singleton registries which need to handle
  * {@link cn.bugstack.springframework.beans.factory.FactoryBean} instances,
  * integrated with {@link DefaultSingletonBeanRegistry}'s singleton management.
- * <p>
  *
+ * 父类定义了IOC容器，这里扩展了工厂bean的IOC容器
+ * 如果是单例，本地存在该bean，就从本地拿，否则调用factory.getObject()，然后放到本地
  */
 public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanRegistry {
 

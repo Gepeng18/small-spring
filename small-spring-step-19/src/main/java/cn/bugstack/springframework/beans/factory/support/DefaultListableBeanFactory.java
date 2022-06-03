@@ -9,7 +9,11 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 父类 AbstractAutowireCapableBeanFactory 定义了利用beanDefinition创建createBean的整体流程，未涉及beanDefinition的操作
+ * 而本类则是定义了关于beanDefinition的所有操作
  *
+ * 本类的很多操作的核心都是getBean(Class)方法
+ *    就是从beanDefinitionMap中拿到一个beanName，然后调用父类的getBean()方法
  */
 public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory implements BeanDefinitionRegistry, ConfigurableListableBeanFactory {
 
@@ -49,6 +53,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
         return beanDefinition;
     }
 
+    // 将所有beanDefinitionMap中的beanName都进行一次getBean操作
+    // getBean操作，会获取bean，如果bean不存在，则创建
     @Override
     public void preInstantiateSingletons() throws BeansException {
         beanDefinitionMap.keySet().forEach(this::getBean);

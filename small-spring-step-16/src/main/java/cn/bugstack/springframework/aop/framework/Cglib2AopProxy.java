@@ -42,6 +42,9 @@ public class Cglib2AopProxy implements AopProxy {
             this.advised = advised;
         }
 
+        /**
+         * 通过方法拦截器进行方法调用
+         */
         @Override
         public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
             CglibMethodInvocation methodInvocation = new CglibMethodInvocation(advised.getTargetSource().getTarget(), method, objects, methodProxy);

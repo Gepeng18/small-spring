@@ -14,9 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
- * <p>
  * BeanDefinition注册表接口
+ * 整合父类的IOC容器以及工厂IOC容器，定义了getBean的方式
  */
 public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport implements ConfigurableBeanFactory {
 
@@ -60,17 +59,22 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
     protected abstract boolean containsBeanDefinition(String beanName);
 
     protected <T> T doGetBean(final String name, final Object[] args) {
+        // 1、从存储单例bean的IOC容器中拿
         Object sharedInstance = getSingleton(name);
         if (sharedInstance != null) {
-            // 如果是 FactoryBean，则需要调用 FactoryBean#getObject
+            // 2、如果是 FactoryBean，则需要调用从其他容器再拿一次，这个容器中存储所有factoryBean （FactoryBean#getObject）
             return (T) getObjectForBeanInstance(sharedInstance, name);
         }
-
+        // 3、所有容器都没有，则通过beanDefinition创建吧，然后再来一次上面的获取步骤
         BeanDefinition beanDefinition = getBeanDefinition(name);
         Object bean = createBean(name, beanDefinition, args);
         return (T) getObjectForBeanInstance(bean, name);
     }
 
+    /**
+     * 1、首先尝试从缓存中获取
+     * 2、如果缓存中没有，则调用 factory.getObject(),然后塞入缓存中
+     */
     private Object getObjectForBeanInstance(Object beanInstance, String beanName) {
         if (!(beanInstance instanceof FactoryBean)) {
             return beanInstance;
@@ -101,6 +105,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
         this.embeddedValueResolvers.add(valueResolver);
     }
 
+    /**
+     * 调用resolver.resolveStringValue 迭代处理 value
+     */
     @Override
     public String resolveEmbeddedValue(String value) {
         String result = value;

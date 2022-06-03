@@ -48,18 +48,19 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
         invokeBeanFactoryPostProcessors(beanFactory);
 
         // 5. BeanPostProcessor 需要提前于其他 Bean 对象实例化之前执行注册操作
+        // 将beanFactory中的BeanPostProcessor从IOC容器中，添加到List<BeanPostProcessor>列表中
         registerBeanPostProcessors(beanFactory);
 
-        // 6. 初始化事件发布者
+        // 6. 初始化事件管理器，并将事件管理器注册进beanFactory
         initApplicationEventMulticaster();
 
-        // 7. 注册事件监听器
+        // 7. 将事件监听器添加进事件管理器中
         registerListeners();
 
         // 8. 设置类型转换器、提前实例化单例Bean对象
         finishBeanFactoryInitialization(beanFactory);
 
-        // 9. 发布容器刷新完成事件
+        // 9. 发布容器刷新完成事件（其实就是调用事件管理器进行发布）
         finishRefresh();
     }
 

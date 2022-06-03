@@ -22,8 +22,8 @@ import java.lang.reflect.Method;
  * with the full capabilities specified by the class.
  * Implements the {@link cn.bugstack.springframework.beans.factory.config.AutowireCapableBeanFactory}
  * interface in addition to AbstractBeanFactory's {@link #createBean} method.
- * <p>
  *
+ * 父类定义了getBean的过程，没有则调用createBean，本类定义了createBean的整体流程
  */
 public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
 
@@ -31,7 +31,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
     @Override
     protected Object createBean(String beanName, BeanDefinition beanDefinition, Object[] args) throws BeansException {
-        // 判断是否返回代理 Bean 对象
+        // 判断是否返回代理 Bean 对象 （其中包括了在bean实例化之前和初始化之后执行的方法）
         Object bean = resolveBeforeInstantiation(beanName, beanDefinition);
         if (null != bean) {
             return bean;
@@ -40,10 +40,14 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         return doCreateBean(beanName, beanDefinition, args);
     }
 
+    /**
+     * 1、执行构造函数
+     * 2、属性填充
+     */
     protected Object doCreateBean(String beanName, BeanDefinition beanDefinition, Object[] args) {
         Object bean = null;
         try {
-            // 实例化 Bean
+            // 1、实例化 Bean
             bean = createBeanInstance(beanDefinition, beanName, args);
 
             // 处理循环依赖，将实例化后的Bean对象提前放入缓存中暴露出来
@@ -52,7 +56,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                 addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, beanDefinition, finalBean));
             }
 
-            // 实例化后判断
+            // Bean 实例化后对于返回 false 的对象，不在执行后续设置 Bean 对象属性的操作
             boolean continueWithPropertyPopulation = applyBeanPostProcessorsAfterInstantiation(beanName, bean);
             if (!continueWithPropertyPopulation) {
                 return bean;
@@ -135,13 +139,18 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     }
 
     protected Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {
+        // 实例化之前
         Object bean = applyBeanPostProcessorsBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
         if (null != bean) {
+            // 初始化之前？ 没搞懂
             bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
         }
         return bean;
     }
 
+    /**
+     * 调用processor进行处理，主要有一个processor的结果不为空，则返回该result
+     */
     protected Object applyBeanPostProcessorsBeforeInstantiation(Class<?> beanClass, String beanName) {
         for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
             if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
@@ -162,6 +171,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     }
 
     protected Object createBeanInstance(BeanDefinition beanDefinition, String beanName, Object[] args) {
+        // 1、按照args的数量，选择一个构造器
         Constructor constructorToUse = null;
         Class<?> beanClass = beanDefinition.getBeanClass();
         Constructor<?>[] declaredConstructors = beanClass.getDeclaredConstructors();
@@ -171,6 +181,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                 break;
             }
         }
+        // 2、将相应的构造使用的参数传入，调用选择的构造器
         return getInstantiationStrategy().instantiate(beanDefinition, beanName, constructorToUse, args);
     }
 
@@ -265,6 +276,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         }
     }
 
+    /**
+     * 调用processor进行处理，主要有一个processor的结果不为空，则返回该result
+     */
     @Override
     public Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName) throws BeansException {
         Object result = existingBean;
@@ -276,6 +290,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         return result;
     }
 
+    /**
+     * 调用所有postProcessors进行处理，如果结果为空，则返回前一个processor的结果
+     */
     @Override
     public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) throws BeansException {
         Object result = existingBean;

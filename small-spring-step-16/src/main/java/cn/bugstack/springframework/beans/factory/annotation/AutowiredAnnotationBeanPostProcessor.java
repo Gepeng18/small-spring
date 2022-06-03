@@ -16,9 +16,7 @@ import java.lang.reflect.Field;
  * that autowires annotated fields, setter methods and arbitrary config methods.
  * Such members to be injected are detected through a Java 5 annotation: by default,
  * Spring's {@link Autowired @Autowired} and {@link Value @Value} annotations.
- * <p>
  * 处理 @Value、@Autowired，注解的 BeanPostProcessor
- * <p>
  *
  */
 public class AutowiredAnnotationBeanPostProcessor implements InstantiationAwareBeanPostProcessor, BeanFactoryAware {

@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *
+ * 单一实例IOC容器，保存了bean，beanFactory，disposableBean等
  */
 public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
 
