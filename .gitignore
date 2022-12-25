@@ -26,6 +26,7 @@ hs_err_pid*
 
 
 /.idea/
+target/
 /small-spring-step-01/small-spring-step-01.iml
 /small-spring-step-02/small-spring-step-02.iml
 /small-spring-step-03/small-spring-step-03.iml

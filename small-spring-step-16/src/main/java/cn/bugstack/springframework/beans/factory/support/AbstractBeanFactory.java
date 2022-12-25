@@ -48,6 +48,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
         return (T) getBean(name);
     }
 
+    /**
+     * 1. 从三级缓存中取 bean，然后根据是否是 FactoryBean 决定是直接返回还是 getObject后返回
+     * 2. 如果三级缓存中没有，则调用 createBean 创建，然后 根据是否是 FactoryBean 决定是直接返回还是 getObject后返回
+     */
     protected <T> T doGetBean(final String name, final Object[] args) {
         // 1、从存储单例bean的IOC容器中拿
         Object sharedInstance = getSingleton(name);
@@ -63,6 +67,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
     }
 
     /**
+     * 如果不是 FactoryBean，直接返回beanInstance
+     * 如果是 FactoryBean
      * 1、首先尝试从缓存中获取
      * 2、如果缓存中没有，则调用 factory.getObject(),然后塞入缓存中
      */

@@ -3,6 +3,7 @@ package cn.bugstack.springframework.test;
 
 import cn.bugstack.springframework.aop.AdvisedSupport;
 import cn.bugstack.springframework.aop.TargetSource;
+import cn.bugstack.springframework.aop.aspectj.AspectJExpressionPointcut;
 import cn.bugstack.springframework.aop.framework.Cglib2AopProxy;
 import cn.bugstack.springframework.context.support.ClassPathXmlApplicationContext;
 import cn.bugstack.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -63,6 +64,7 @@ public class ApiTest {
 
         JdbcService jdbcService = new JdbcServiceImpl();
 
+        // 保存注解解析类的
         AnnotationTransactionAttributeSource transactionAttributeSource = new AnnotationTransactionAttributeSource();
         transactionAttributeSource.findTransactionAttribute(jdbcService.getClass());
 
@@ -70,14 +72,15 @@ public class ApiTest {
         DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(dataSource);
         TransactionInterceptor interceptor = new TransactionInterceptor(transactionManager, transactionAttributeSource);
 
-        BeanFactoryTransactionAttributeSourceAdvisor btas = new BeanFactoryTransactionAttributeSourceAdvisor();
-        btas.setAdvice(interceptor);
+//        BeanFactoryTransactionAttributeSourceAdvisor btas = new BeanFactoryTransactionAttributeSourceAdvisor();
+//        btas.setAdvice(interceptor);
 
 
         AdvisedSupport advisedSupport = new AdvisedSupport();
         advisedSupport.setTargetSource(new TargetSource(jdbcService));
         advisedSupport.setMethodInterceptor(interceptor);
-        advisedSupport.setMethodMatcher(btas.getPointcut().getMethodMatcher());
+//        advisedSupport.setMethodMatcher(btas.getPointcut().getMethodMatcher());
+        advisedSupport.setMethodMatcher(new AspectJExpressionPointcut("execution(* cn.bugstack.springframework.test.service.JdbcService.*(..))")); // 没写完，可以参考书中内容
         advisedSupport.setProxyTargetClass(false);
 
         JdbcService proxyCglib = (JdbcServiceImpl) new Cglib2AopProxy(advisedSupport).getProxy();

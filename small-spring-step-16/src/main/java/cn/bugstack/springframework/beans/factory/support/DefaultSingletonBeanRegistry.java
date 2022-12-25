@@ -51,6 +51,7 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
             if (null == singletonObject) {
                 ObjectFactory<?> singletonFactory = singletonFactories.get(beanName);
                 if (singletonFactory != null) {
+                    // 调用构造函数造出来的bean，然后被AOP依赖注入后，获得的singletonObject
                     singletonObject = singletonFactory.getObject();
                     // 把三级缓存中的代理对象中的真实对象获取出来，放入二级缓存中
                     earlySingletonObjects.put(beanName, singletonObject);

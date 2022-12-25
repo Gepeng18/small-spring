@@ -54,16 +54,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                 addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, beanDefinition, finalBean));
             }
 
-            // Bean 实例化后对于返回 false 的对象，不在执行后续设置 Bean 对象属性的操作
+            // 多个InstantiationAwareBeanPostProcessor决定，实例化后，还是否需要做剩下的处理，目前都返回true，即都需要执行后续操作
             boolean continueWithPropertyPopulation = applyBeanPostProcessorsAfterInstantiation(beanName, bean);
             if (!continueWithPropertyPopulation) {
                 return bean;
             }
-            // 在设置 Bean 属性之前，允许 BeanPostProcessor 修改属性值
+            // 在设置 Bean 属性之前，实例化之后，允许 BeanPostProcessor 修改bean属性值（autowired注入就是这里做的）
             applyBeanPostProcessorsBeforeApplyingPropertyValues(beanName, bean, beanDefinition);
-            // 给 Bean 填充属性
+            // 给 Bean 填充属性，依据xml中的配置
             applyPropertyValues(beanName, bean, beanDefinition);
-            // 执行 Bean 的初始化方法和 BeanPostProcessor 的前置和后置处理方法
+            // 执行 Bean 的初始化方法（init-method or afterPropertiesSet）和 BeanPostProcessor 的前置和后置处理方法
             bean = initializeBean(beanName, bean, beanDefinition);
         } catch (Exception e) {
             throw new BeansException("Instantiation of bean failed", e);
@@ -132,6 +132,10 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         }
     }
 
+    /**
+     * 前置和 InstantiationAwareBeanPostProcessor有关
+     * 后置针对所有的 BeanPostProcessor
+     */
     protected Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {
         // 实例化之前
         Object bean = applyBeanPostProcessorsBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
