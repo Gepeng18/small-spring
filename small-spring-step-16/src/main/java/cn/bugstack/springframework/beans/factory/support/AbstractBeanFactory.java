@@ -56,11 +56,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
         // 1、从存储单例bean的IOC容器中拿
         Object sharedInstance = getSingleton(name);
         if (sharedInstance != null) {
-            // 2、如果是 FactoryBean，则需要调用从其他容器再拿一次，这个容器中存储所有factoryBean （FactoryBean#getObject）
+            // 2、如果是 FactoryBean，则从其他容器拿，这个容器中存储所有factoryBean的getObject （FactoryBean#getObject）
             return (T) getObjectForBeanInstance(sharedInstance, name);
         }
 
-        // 3、所有容器都没有，则通过beanDefinition创建吧，然后再来一次上面的获取步骤
+        // 3、IOC容器中没有，则通过beanDefinition创建，然后再根据是否是factoryBean走直接返回还是从单独的容器中取的逻辑
         BeanDefinition beanDefinition = getBeanDefinition(name);
         Object bean = createBean(name, beanDefinition, args);
         return (T) getObjectForBeanInstance(bean, name);

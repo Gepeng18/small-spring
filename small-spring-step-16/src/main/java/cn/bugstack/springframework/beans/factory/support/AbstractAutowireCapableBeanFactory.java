@@ -32,6 +32,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         // 判断是否返回代理 Bean 对象 （其中包括了在bean实例化之前和初始化之后执行的方法）
         Object bean = resolveBeforeInstantiation(beanName, beanDefinition);
         if (null != bean) {
+            // 这里目前没看到使用
             return bean;
         }
 
@@ -54,12 +55,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                 addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, beanDefinition, finalBean));
             }
 
-            // 多个InstantiationAwareBeanPostProcessor决定，实例化后，还是否需要做剩下的处理，目前都返回true，即都需要执行后续操作
+            // 【看不懂，不看】多个InstantiationAwareBeanPostProcessor决定，实例化后，还是否需要做剩下的处理，目前都返回true，即都需要执行后续操作
             boolean continueWithPropertyPopulation = applyBeanPostProcessorsAfterInstantiation(beanName, bean);
             if (!continueWithPropertyPopulation) {
                 return bean;
             }
-            // 在设置 Bean 属性之前，实例化之后，允许 BeanPostProcessor 修改bean属性值（autowired注入就是这里做的）
+            // 在实例化之后，设置 Bean 属性之前，允许 BeanPostProcessor 修改bean属性值（autowired注入就是这里做的）
             applyBeanPostProcessorsBeforeApplyingPropertyValues(beanName, bean, beanDefinition);
             // 给 Bean 填充属性，依据xml中的配置
             applyPropertyValues(beanName, bean, beanDefinition);
